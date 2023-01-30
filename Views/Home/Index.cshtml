@@ -1,0 +1,141 @@
+﻿@using WebMatrix.Data;
+
+@{
+
+    // opening a database connection
+    var db = Database.Open("ClientData");
+
+    // getting all the clients from the database
+    var clients = db.Query("SELECT * FROM Clients");
+
+    // create a pie chart to display the loan purposes
+    var loanPurposes = db.Query("SELECT * FROM LoanPurposes");
+
+    var loanPurposeCount = "SELECT COUNT(clientID) FROM Clients LEFT JOIN LoanPurposes ON Clients.purposeID = LoanPurposes.purposeID WHERE LoanPurposes.purposeID = @0 GROUP BY LoanPurposes.purposeID";
+
+    // number of clients per category
+    var Purchase_OO = db.QueryValue(loanPurposeCount, 1); // the number next to the SQL query is the purposeID
+    var Purchase_INV = db.QueryValue(loanPurposeCount, 2);
+    var Refinance_OO = db.QueryValue(loanPurposeCount, 3);
+    var Refinance_INV = db.QueryValue(loanPurposeCount, 4);
+    var Construction_OO = db.QueryValue(loanPurposeCount, 5);
+    var Construction_INV = db.QueryValue(loanPurposeCount, 6);
+
+
+    // if any of the values are null, set them to 2
+    // (this is to prevent the pie chart from breaking)
+    if (Purchase_OO == null) { Purchase_OO = 2; }
+    if (Purchase_INV == null) { Purchase_INV = 2; }
+    if (Refinance_OO == null) { Refinance_OO = 2; }
+    if (Refinance_INV == null) { Refinance_INV = 2; }
+    if (Construction_OO == null) { Construction_OO = 2; }
+    if (Construction_INV == null) { Construction_INV = 2; }
+
+
+    // number of clients per loan status
+
+    var loanStatusCount = "SELECT COUNT(clientID) FROM Clients WHERE LoanStatus = @0 GROUP BY LoanStatus";
+
+    // number of clients per status
+    var Settled = db.QueryValue(loanStatusCount, "Settled");
+    var NotProceeding = db.QueryValue(loanStatusCount, "Not Proceeding");
+    var InProcess = db.QueryValue(loanStatusCount, "In Process");
+    var Listed = db.QueryValue(loanStatusCount, "Listed");
+}
+
+
+<div class="container bg-danger p-5">
+    <div class="row">
+        <div class="col-6">
+            <h2 class="text-light">Welcome, Taqi</h2>
+            <p class="text-light">
+                This is your main page. You will find some useful information here.<br />
+                At the right, you can find the number of loans you have listed, settled and are in process. At the bottom, you can see the number of clients per loan purpose and the number of clients per loan status.
+            </p>
+            <h5 class="text-light">Happy working!</h5>
+        </div>
+        <div class="col-6">
+            <h1 class="text-white text-center">At a glance:</h1><br />
+            <h6 class="text-center text-light">Total Number of Loans: <span class="fw-bold"> @clients.Count()</span></h6>
+            <h6 class="text-center text-light">Number of Loans Settled: <span class="fw-bold"> @Settled</span></h6>
+            <h6 class="text-center text-light">Number of Loans In Process: <span class="fw-bold">@InProcess</span></h6>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+    <div class="row">
+
+        <div class="col-4 justify-content-center">
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script type="text/javascript">
+                google.charts.load("current", { packages: ["corechart"] });
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    var data = google.visualization.arrayToDataTable([
+                        ['Loan Types', 'Number of Clients'],
+                        ['Purchase - OO', @Purchase_OO],
+                        ['Purchase - INV', @Purchase_INV],
+                        ['Refinance - OO', @Refinance_OO],
+                        ['Refinance - INV', @Refinance_INV],
+                        ['Construction - OO', @Construction_OO],
+                        ['Construction - INV', @Construction_INV]
+
+                    ]);
+                    var options = {
+                        title: 'Loan Types',
+                        pieHole: 0.4,
+                        // background color
+                        backgroundColor: '#f8f9fa',
+                        color: ['red', 'blue', 'green', 'yellow', 'orange', 'purple']
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+                    chart.draw(data, options);
+                }
+            </script>
+            <div id="donutchart" style="width: 800px; height: 500px;" class="bg-light"></div>
+        </div>
+
+        <div class="col-4 justify-content-end">
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script type="text/javascript">
+                google.charts.load("current", { packages: ['corechart'] });
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    var data = google.visualization.arrayToDataTable([
+                        ["Element", "Number of Clients", { role: "style" }],
+                        ["Settled", @Settled, "#198754"],
+                        ["Not Proceeding", @NotProceeding, "#dc3545"],
+                        ["In Process", @InProcess, "#fd7e14"],
+                        ["Listed", @Listed, "color: #0d6efd"]
+                    ]);
+
+                    var view = new google.visualization.DataView(data);
+                    view.setColumns([0, 1,
+                        {
+                            calc: "stringify",
+                            sourceColumn: 1,
+                            type: "string",
+                            role: "annotation"
+                        },
+                        2]);
+
+                    var options = {
+                        title: "Status of Loan Applications",
+                        width: 600,
+                        height: 400,
+                        bar: { groupWidth: "95%" },
+                        legend: { position: "none" },
+                        backgroundColor: 'transparent',
+                        color: ['red', 'blue', 'green', 'yellow', 'orange', 'purple']
+                    };
+                    var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+                    chart.draw(view, options);
+                }
+            </script>
+            <div id="columnchart_values" class="p-5" style="width: 1000px; height: 300px; margin-left: 200px;"></div>
+        </div>
+    </div>
+</div>

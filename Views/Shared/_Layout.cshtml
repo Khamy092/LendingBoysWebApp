@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lending Boys | @ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body class="bg-light">
+    @*<div class="breadcrumb p-5">
+        <h6 class="text-center mb-5 breadcrumb-item">
+            @{
+                if (ViewBag.Title == "Home")
+                {
+                    <text>Home Sweet Home!</text>
+                }
+                else
+                {
+                    <text><a class="text-decoration-none" href="~/Home/">Home</a> / <a class="text-decoration-none" href="@ViewBag.Title">@ViewBag.Title</a></text>
+                }
+            }
+        </h6>
+        </div>*@
+        <div class="container">
+            <header>
+                <h1 class="text-center text-danger mb-2" style="font-size:5vw;"><span class="bg-danger text-white">L</span>ending <span class="bg-danger text-white">B</span>oys</h1>
+                <nav>
+                    <ul class="nav nav-pills justify-content-center mb-5 fw-bold">
+                        <li class="nav-item">
+                            @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("Clients", "Clients", "Home", new { area = "" }, new { @class = "nav-link" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+        <div class="container body-content">
+            @RenderBody()
+            <hr / class="mt-5">
+            <footer>
+                <p class="text-center">&copy; @DateTime.Now.Year - Lending Boys Pty Ltd | ABN: XXX 0000 XXXX</p>
+            </footer>
+        </div>
+
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+</body>
+</html>

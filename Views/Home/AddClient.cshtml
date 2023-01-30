@@ -1,0 +1,279 @@
+﻿@using WebMatrix.Data
+@{
+    // opening a database connection
+    var db = Database.Open("ClientData");
+
+    // getting the LoanPurposes from the database
+    var LoanPurposes = db.Query("SELECT * FROM LoanPurposes");
+
+    var AddClient = "INSERT INTO Clients(firstName, lastName, DOB, gender, email, phoneNumber, brokerNotes, purposeID, loanType, documentCheckList, LoanStatus) " +
+                    "VALUES(@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10)";
+
+    if (IsPost)
+    {
+        // getting the data from the form
+
+        var firstName = Request.Form["FirstName"];       // getting the FirstName from the form
+        var lastName = Request.Form["LastName"];            // getting the LastName from the form
+        var DOB = Request.Form["BirthDate"];                   // getting the date of birth
+        var gender = Request.Form["inlineRadioOptions"];           // getting the gender
+        var email = Request.Form["emailAddress"];                      // getting the email address
+        var ClientphoneNumber = Request.Form["phoneNumber"];              // getting the phone number
+        var brokerNotes = Request.Form["BrokerNotes"];                       // getting the broker notes from the textarea
+        var LoanPurpose = Request.Form["LoanPurpose"];                          // getting the loan purpose
+        var LoanType = Request.Form["LoanType"];                                   // getting the loan type
+
+
+        var documentCheckList = "";
+
+
+        if (Request.Form["DL"] == "on") // if the checkbox in the form is checked then add a text to the documentChecklist variable
+        {
+            documentCheckList += "Driver's Licence, ";
+        }
+        if (Request.Form["Pass&Citi"] == "on")
+        {
+            documentCheckList += " Passport,";
+        }
+        if (Request.Form["ITR"] == "on")
+        {
+            documentCheckList += " Income Tax Return,";
+        }
+        if (Request.Form["CTR"] == "on")
+        {
+            documentCheckList += " Company Tax Return,";
+        }
+
+        if (Request.Form["PaySlips"] == "on")
+        {
+            documentCheckList += " Paylsips,";
+        }
+
+        if (Request.Form["BankStatements"] == "on")
+        {
+            documentCheckList += " Bank Statements,";
+        }
+        if (Request.Form["HomeLoanStatements"] == "on")
+        {
+            documentCheckList += " Home Loan Statements";
+        }
+
+        // adding the data to the database
+
+        try
+        {
+
+
+            db.Execute(AddClient, firstName, lastName, DOB, gender, email, ClientphoneNumber, brokerNotes, LoanPurpose, LoanType, documentCheckList, "Listed"); // intially adding as listed category.
+
+            // if the data added successfully then showing a confirmation message.
+
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Client added sucessfully.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        catch
+        {
+
+            // Showing an error message instead of crashing the whole thing.
+            
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                There was a problem with adding the client. Please try again.
+            </div>
+        }
+    }
+}
+
+
+<h1 class="text-dark text-center">Add New Client</h1>
+<div class="container py-5 h-100">
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-9 col-xl-7">
+            <div class="card shadow-sm card-registration bg-light" style="border-radius: 20px;">
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" action="~/Home/AddClient">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+
+                                <div class="form-outline">
+                                    <label class="form-label" for="firstName">First Name</label>
+                                    <input type="text" name="FirstName" value="@Request.Form["FirstName"]" class="form-control form-control-lg" />
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 mb-4">
+
+                                <div class="form-outline">
+                                    <label class="form-label" for="lastName">Last Name</label>
+                                    <input type="text" name="LastName" value="@Request.Form["LastName"]" class="form-control form-control-lg" />
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4 d-flex align-items-center">
+
+                                <div class="form-outline datepicker w-100">
+
+                                    <label for="birthdayDate" class="form-label">Birthday</label>
+                                    <input type="date" class="form-control form-control-lg" id="birthdayDate" name="BirthDate" value="@Request.Form["BirthDate"]" />
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <br />
+                                <h6 class="mb-2 pb-1">Gender: </h6>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="femaleGender"
+                                           value="Female" checked />
+                                    <label class="form-check-label" for="femaleGender">Female</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="maleGender"
+                                           value="Male" />
+                                    <label class="form-check-label" for="maleGender">Male</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="otherGender"
+                                           value="Other" />
+                                    <label class="form-check-label" for="otherGender">Other</label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4 pb-2">
+
+                                <div class="form-outline">
+                                    <label class="form-label" for="emailAddress">Email</label>
+                                    <input type="email" name="emailAddress" id="emailAddress" placeholder="name@example.com" class="form-control form-control-lg" value="@Request.Form["emailAddress"]" />
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-6 mb-4 pb-2">
+
+                                <div class="form-outline">
+                                    <label class="form-label" for="phoneNumber">Phone Number</label>
+                                    <input type="tel" id="phoneNumber" name="phoneNumber" value="@Request.Form["phoneNumber"]" class="form-control form-control-lg" placeholder="04..." />
+                                    @{
+                                        var phoneNumber = Request.Form["phoneNumber"];
+
+                                        // if phone number is not digits then display error message
+                                        if (!string.IsNullOrEmpty(phoneNumber) && !phoneNumber.All(char.IsDigit))
+                                        {
+                                            <span class="text-danger">Phone number must be digits only</span>
+                                        }
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4 pb-2">
+
+                                <label class="form-label select-label">Loan Purpose</label><br />
+                                <select class="select form-control-lg col-12" name="LoanPurpose">
+                                    <option value="0" disabled>Choose option</option>
+
+                                    @{
+                                        // looping through the LoanPurposes and displaying them in the select
+
+                                        foreach (var loanPurpose in LoanPurposes)
+                                        {
+                                            <option value="@loanPurpose.purposeID">@loanPurpose.Purpose</option>
+                                        }
+                                    }
+                                </select>
+
+                            </div>
+                            <div class="col-md-6 mb-4 pb-2">
+
+                                <label class="form-label select-label">Loan Type</label><br />
+                                <select class="select form-control-lg col-12" name="LoanType" value="@Request.Form["LoanType"]">
+                                    <option value="1" disabled>Choose option</option>
+                                    <option value="Formal Approval">Formal Approval</option>
+                                    <option value="Pre-Approval">Pre-Approval</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <hr />
+
+                        <div class="row" style="min-width:100%;">
+
+                            <div class="col-md-12 mb-4">
+                                <br />
+                                <h4 class="mb-2 pb-1">Documents Checklist</h4>
+                                <h6 class="text-danger mb-2">Please select all the applicable documents.</h6>
+
+                               
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="flexCheckDefault" name="DL" />
+                                    <label class="form-check-label" for="flexCheckDefault">Driver's Licence</label>
+                                </div>
+
+                               
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  id="flexCheckChecked" name="Pass&Citi" />
+                                    <label class="form-check-label" for="flexCheckChecked">Passport / Citizenship</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="PalySlips"  id="flexCheckChecked" />
+                                    <label class="form-check-label" for="flexCheckChecked">Payslips</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  name="ITR" id="flexCheckChecked" />
+                                    <label class="form-check-label" for="flexCheckChecked">Income Tax Returns</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  name="CTR" id="flexCheckChecked" />
+                                    <label class="form-check-label" for="flexCheckChecked">Company Financials</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  name="BankStatements" id="flexCheckChecked" />
+                                    <label class="form-check-label" for="flexCheckChecked">Bank Statements</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="HomeLoanStatements" id="flexCheckChecked" />
+                                    <label class="form-check-label" for="flexCheckChecked">Home Loan Statements</label>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="form-group">
+                                <h4 class="mb-2 pb-1">Broker Notes:</h4>
+                                <textarea class="form-control" style="min-width:100%;" id="brokerNotes" name="BrokerNotes" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-2">
+                            <input class="btn btn-danger btn-lg" type="submit" value="Submit" />
+                            <input class="btn btn-warning btn-lg" type="reset" value="Clear" />
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

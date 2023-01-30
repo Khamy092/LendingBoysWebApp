@@ -1,0 +1,185 @@
+﻿@using WebMatrix.Data;
+
+@{
+
+    // opening a database connection
+    var db = Database.Open("ClientData");
+
+    // getting all the clients from the database
+    var clients = db.Query("SELECT * FROM Clients LEFT JOIN LoanPurposes ON Clients.purposeID = LoanPurposes.purposeID");
+
+    // search query
+
+    var searchQuery = "SELECT * FROM Clients " +
+        "LEFT JOIN LoanPurposes ON Clients.purposeID = LoanPurposes.purposeID " +
+        "WHERE firstName LIKE CONCAT('%', @0, '%') " +
+        "OR lastName LIKE CONCAT('%', @0, '%') " +
+        "OR clientID LIKE CONCAT('%', @0, '%') " +
+        "OR email LIKE CONCAT('%', @0, '%') " +
+        "OR phoneNumber LIKE CONCAT('%', @0, '%') " +
+        "ORDER BY firstName ASC";
+
+    var searchResult = db.Query(searchQuery, Request.Form["SearchText"]);
+
+    var removeClient = "DELETE FROM Clients WHERE clientID = @0";
+
+    if (IsPost && Request.Form["deleteClient"] != null)
+    {
+        try
+        {
+            db.Execute(removeClient, Request.Form["deleteClient"]);
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Client successfully removed.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            // wait for 3 seconds before refreshing the page    
+            Response.AddHeader("REFRESH", "3;URL=/Home/Clients");
+            // refresh the page
+            Response.Redirect("/Home/Clients");
+        }
+
+        catch
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                There was a problem when removing the client. Please try again.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    }
+
+    // redirect to the client page
+
+
+
+}
+
+
+<h1 class="text-center mt-5 mb-5">Clients</h1>
+<div class="row">
+    <div class="mb-5 input-group" style="max-width: 100%;">
+        <form method="post" action="~/Home/Clients">
+            <div class="input-group">
+                <input type="search" class="form-control rounded shadow-sm" name="SearchText" value="@Request.Form["SearchText"]" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                <button type="submit" class="btn btn-outline-primary rounded p-2 shadow-sm" style="margin-left: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                    </svg> Search
+                </button>
+                <a href="~/Home/AddClient" class="btn btn-primary rounded p-2 shadow-sm" style="margin-left: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
+                    </svg> Add Client
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+<table class="table shadow-sm table-hover">
+    <thead class="bg-danger text-white text-center">
+        <tr>
+            <th scope="col">Client ID</th>
+            <th scope="col">Full Name</th>
+            <th scope="col">Loan Purpose</th>
+            <th scope="col">Loan Type</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">View/Edit/Delete</th>
+        </tr>
+    </thead>
+    <tbody class="text-center table-light align-middle">
+
+        @{
+
+            // displaying all clients when there is no search query.
+
+            if (IsPost != true && Request.Form["SearchText"] is null)
+            {
+                foreach (var client in clients)
+                {
+                    <tr>
+                        <th>@client.clientID</th>                                   <!-- Client ID-->
+                        <td>@client.firstName @client.lastName</td>                 <!-- Client Name-->
+                        <td>@client.purpose</td>                                    <!-- Loan Purpose-->
+                        <td>@client.loanType</td>                                   <!-- Loan Type -->
+                        <td>@client.phoneNumber</td>                                <!-- Phone Number-->
+
+                        <td>
+                            <form method="post" action="~/Home/Clients/" onsubmit="return confirm('Are you sure you want to delete @client.firstName @client.lastName ?');">
+                                <!-- view more -->
+
+                                <a href="/Home/Details?id=@client.clientID" class="btn btn-sm btn-primary shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+                                    </svg>
+                                </a>
+
+                                <!-- edit client-->
+
+                                <a href="/Home/Edit?id=@client.clientID" target="_blank" class="btn btn-sm btn-warning m-2 shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                    </svg>
+                                </a>
+                                <!-- delete client -->
+
+                                <button name="deleteClient" type="submit" class="btn btn-sm btn-danger shadow-sm" value="@client.clientID">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+
+                    </tr>
+                }
+            }
+
+            // displaying the search result when the search button is clicked and there is something to show!
+
+            else if (IsPost is true && Request.Form["SearchText"] != null && searchResult.Count() > 0)
+            {
+                foreach (var result in searchResult)
+                {
+                    <tr>
+                        <th>@result.clientID</th>                                   <!-- Client ID-->
+                        <td>@result.firstName @result.lastName</td>                 <!-- Client Name-->
+                        <td>@result.purpose</td>                                    <!-- Loan Purpose-->
+                        <td>@result.loanType</td>                                   <!-- Loan Type -->
+                        <td>@result.phoneNumber</td>                                <!-- Phone Number-->
+                        <td>
+                            <a href="/Home/Details?id=@result.clientID" target="_blank" class="btn btn-sm btn-primary shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+                                </svg>
+                            </a><a href="/Home/Edit?id=@result.clientID" target="_blank" class="btn btn-sm btn-warning m-2 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                </svg>
+                            </a>
+
+                            <button name="deleteClient" type="submit" class="btn btn-sm btn-danger shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
+                                </svg>
+                            </button>
+                        </td> <!-- Actions -->
+                    </tr>
+
+                }
+            }
+
+            // if the search query doesn't return anything ...
+
+            else if (IsPost is true && Request.Form["SearchText"] != null && searchResult.Count() == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center fw-bold">No results found.</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
