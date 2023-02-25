@@ -1,31 +1,30 @@
 # Lending Boys Web Application
-A brief description of your project, its purpose, and its features.
 
-## Table of Contents
-Installation
-Usage
-Contributing
-License
-## Installation
-Step-by-step instructions on how to install and set up your application. Include any dependencies that need to be installed or configured.
+## Background:
 
-## Usage
-Explain how to use your application and any features that it offers. Provide examples or screenshots if necessary.
 
-## Contributing
-Explain how others can contribute to your project. This can include guidelines for code contributions, bug reports, and feature requests.
+## About The Application:
+The Lending Boys Web Application is a simple and user-friendly platform for managing client information. It allows to easily add, view, edit, and remove customer profiles. Additionally, the application also provides search feature to quickly find customer profiles based on client ID, name, and phone number.
 
-## License
-Include information about the license under which your application is released. If you're not sure which license to use, you can use a site like Choose a License to help you decide.
+## Tech Stack I Used:
 
-## Credits
-List any resources, tools, or libraries that you used in the development of your application. You can also acknowledge any individuals or organizations that provided support or inspiration for your project.
+### Front-End:
 
-## Contact
-Provide information on how others can contact you if they have questions, feedback, or issues with your application. You can include your email address or social media profiles.
 
-## Acknowledgements
-If there are any people or organizations that you would like to acknowledge for their contributions or support, you can include them here.
+#### Back-End:
 
-## Conclusion
-By including all the necessary information in your README, you can make it easier for others to understand and use your application. Good luck!
+
+#### Database:
+
+## Tools I Used:
+
+## Limitations:
+
+
+## Challenges I Faced:
+
+
+## What I Learned:
+
+
+## General Tips:
