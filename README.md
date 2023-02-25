@@ -14,7 +14,7 @@ The Lending Boys Web Application is a simple and user-friendly platform for mana
 #### Back-End:
 
 
-#### Database:
+### Database:
 
 ## Tools I Used:
 
