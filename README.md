@@ -2,7 +2,7 @@
 
 ## Background:
 
-I was once working with a self-employed mortgage broker who were using a messy excel chart for client information managment. It was too much to handle at some points that I decide to do something about it. Luckily, at the same semester at university, we learned about web applications and database a bit. It was enough to get me started to make this happen.
+I was once working with a self-employed mortgage broker who were using a messy excel sheet for client information managment. It was too much to handle at some points that I decide to do something about it. Luckily, at the same semester at university, we learned about web applications and database a bit. It was enough to get me started to make this happen.
 
 ## About The Application:
 The Lending Boys Web Application is a simple and user-friendly platform for managing client information. It allows to easily add, view, edit, and remove customer profiles. Additionally, the application also provides search feature to quickly find customer profiles based on client ID, name, and phone number.
