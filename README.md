@@ -9,6 +9,9 @@ The Lending Boys Web Application is a simple and user-friendly platform for mana
 
 ### How it works:
 
+Here is a quick video of the application:
+https://youtu.be/xIBwhXE3I54
+
 To be updated.
 
 ## Tech Stack I Used:
