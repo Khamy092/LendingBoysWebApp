@@ -40,7 +40,7 @@ I think you can guess it. Back-End 😄
 
 But you know what? I loved it. It took me beyond my comfort zone and taught me a lot of new stuff. I kinda see back-end as a huge opportinuty to learn more now. Specially, when the solutions or guides you find do not directly solve your problem which is good. It makes you think and analyse and use existing solutions to solve your unique problem.
 
-Another challenging part was handling null values from the database. There are always there and need to be handled if you don't wanna see a page with red texts. You can use try & catch in C# to handle them like a boss. 
+Another challenging part was handling null values from the database. They are always there and need to be handled if you don't wanna see a page with red texts. You can use try & catch in C# to handle them like a boss. 
 
 
 ## What I Learned:
